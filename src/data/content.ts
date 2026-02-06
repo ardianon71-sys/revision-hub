@@ -808,51 +808,82 @@ export const categories: Category[] = [
       {
         id: "git-basics",
         title: "Basics & Commands",
-        definition: "Git is a version control system that tracks code changes locally. GitHub is an online platform to store Git projects and collaborate. Git works offline; GitHub works online.",
+        definition: "Git is a version control system that tracks code changes locally. GitHub is an online platform to store Git projects and collaborate. Git works offline; GitHub works online. The workflow is: Working Directory → Staging Area → Local Repo → Remote Repo.",
         whyItMatters: "Every developer uses Git daily. It lets you track history, undo mistakes, work in branches, collaborate with teams, and keep backups.",
         syntax: [
-          "git init              → start a new git repo\ngit status            → see what changed\ngit add .             → stage all changes\ngit commit -m \"msg\"   → save a checkpoint\ngit log               → see commit history",
-          "git branch            → see/create branches\ngit checkout branchName → switch branch\ngit merge branchName  → merge branch into current\ngit remote -v         → view remote repo links",
-          "git push              → upload commits to GitHub\ngit pull              → download + merge updates\ngit clone URL         → copy a repo from GitHub\ngit fetch             → download updates (don't merge)"
+          "// Daily flow\ngit add . → git commit -m \"message\" → git push",
+          "// Check & Inspect\ngit status            → current state\ngit diff              → see exact changes\ngit log --oneline     → commit history\ngit show HEAD         → see last commit",
+          "// Add / Remove from staging\ngit add file.txt      → stage one file\ngit add .             → stage all\ngit rm --cached file  → unstage file",
+          "// Discard Changes\ngit restore file.txt        → undo working dir change\ngit restore --staged file   → unstage file\ngit reset --hard HEAD       → reset everything to last commit ⚠️",
+          "// Commit Control\ngit commit -m \"message\"        → normal commit\ngit commit --amend             → edit last commit\ngit commit --amend -m \"new\"    → change last message\ngit commit --amend --no-edit   → add to last commit silently\n// ⚠️ If already pushed → git push --force",
+          "// Push / Pull / Clone\ngit push              → upload commits\ngit pull              → download + merge\ngit clone URL         → copy a repo\ngit fetch             → download (don't merge)"
         ],
         examples: [
           "// Git vs GitHub\n| Git                    | GitHub                         |\n| version control system | hosting platform for Git repos |\n| works locally/offline  | works online                   |\n| tracks code history    | share, collaborate, PRs        |\n| command line tool      | web app + extra features       |",
-          "// fetch vs pull\ngit fetch → downloads but does NOT change your code (safe)\ngit pull  → downloads AND merges (fast but can conflict)"
+          "// fetch vs pull\ngit fetch → downloads but does NOT change your code (safe)\ngit pull  → downloads AND merges (fast but can conflict)",
+          "// Git Workflow\nWorking Directory → Staging Area → Local Repo → Remote Repo"
+        ],
+        commonMistakes: [
+          "Using git reset --hard without thinking — it deletes all uncommitted changes permanently.",
+          "Forgetting to stage changes before committing (git add . first).",
+          "Using --force push on shared branches — can overwrite teammates' work."
         ],
         recap: [
           "Git = local version control, GitHub = online hosting",
-          "git add → stage, git commit → save, git push → upload",
+          "Daily flow: git add . → git commit -m → git push",
+          "git diff to see exact changes before committing",
+          "git restore to undo changes, git restore --staged to unstage",
+          "git commit --amend to edit last commit",
           "git pull = fetch + merge",
           "git fetch = check what's new (safe)",
-          "Always commit after small changes with meaningful messages",
-          "VCS: collaboration, storing versions, restoring, backup"
+          "Always commit after small changes with meaningful messages"
         ],
         practiceQuestions: [
           { question: "What's the difference between git fetch and git pull?", options: ["No difference", "fetch downloads only, pull downloads and merges", "pull downloads only", "fetch is faster"], answer: "fetch downloads only, pull downloads and merges" },
           { question: "Which command starts a new git repository?", options: ["git start", "git new", "git init", "git create"], answer: "git init" },
-          { question: "Does Git work offline?", options: ["Yes", "No", "Only with GitHub", "Only for commits"], answer: "Yes" }
+          { question: "How do you undo changes in a file before committing?", options: ["git undo file", "git restore file", "git revert file", "git reset file"], answer: "git restore file" },
+          { question: "What does git commit --amend do?", options: ["Creates a new commit", "Edits the last commit", "Deletes last commit", "Merges commits"], answer: "Edits the last commit" }
         ]
       },
       {
         id: "git-collaboration",
-        title: "Collaboration",
-        definition: "Git enables collaboration through branching and remote repositories. You can create branches for new features, push them to GitHub, and merge them back when ready.",
-        whyItMatters: "Real-world projects involve multiple developers. Understanding collaboration workflows prevents code conflicts and keeps projects organized.",
+        title: "Collaboration & Branching",
+        definition: "Git enables collaboration through branching and remote repositories. Branches isolate features. Reset rewrites history (dangerous), Revert creates safe undo commits. .gitignore excludes files from tracking.",
+        whyItMatters: "Real-world projects involve multiple developers. Understanding collaboration workflows, merge conflicts, and safe undo operations is essential.",
         syntax: [
-          "// Push a new branch\ngit push --set-upstream origin new_branch_name",
-          "// Basic collaboration workflow\n1. Create a branch for your feature\n2. Make changes and commit\n3. Push the branch to GitHub\n4. Create a Pull Request\n5. Team reviews and merges"
+          "// Branching\ngit branch              → list branches\ngit branch name         → create branch\ngit checkout name       → switch branch\ngit checkout -b name    → create + switch\ngit merge branch_name   → merge into current\ngit branch -d name      → delete after merge",
+          "// Reset vs Revert (Very Important!)\n// Reset = Rewrite History (Dangerous)\ngit reset --soft HEAD^   → undo commit, keep staged\ngit reset --hard HEAD^   → delete commit + changes ⚠️\n// ❌ Avoid in shared repos\n\n// Revert = Safe\ngit revert HEAD          → creates new undo commit\ngit revert commit_id     → undo specific commit\n// ✅ Safe for shared repos",
+          "// Remote & Push\ngit remote add origin REPO_URL\ngit remote -v\ngit branch -M main\ngit push -u origin main\ngit pull origin main",
+          "// .gitignore (Must Know)\n.env           → hide secrets\n*.txt          → ignore all .txt files\n!main.txt      → except main.txt\nfolder/        → ignore entire folder\ntest?.txt      → wildcard pattern",
+          "// Push a new branch\ngit push --set-upstream origin branch_name"
         ],
         examples: [
-          "// Workflow example\ngit checkout -b new-feature\n// ... make changes ...\ngit add .\ngit commit -m \"Add new feature\"\ngit push --set-upstream origin new-feature"
+          "// Collaboration Models\nCollaboration → Clone repo → Push directly\nContribution  → Fork → Clone → Pull Request",
+          "// Merge Conflicts\nCause: Same file, same lines, different branches\nFix: Resolve manually → git add . → git commit",
+          "// Detached HEAD (Read-Only Mode)\ngit checkout commit_id  → view old code safely\n// To save work from detached HEAD:\ngit switch -c new-branch",
+          "// Mental Model\nreset    → move HEAD (rewrite history)\nrevert   → create undo commit (safe)\ncheckout → move HEAD to branch/commit\nmerge    → combine branches\npull     → fetch + merge\npush     → upload commits"
+        ],
+        commonMistakes: [
+          "Using reset on shared branches — it rewrites history and breaks teammates' code.",
+          "Forgetting to resolve merge conflicts before committing.",
+          "Not adding .env to .gitignore — exposing secrets publicly.",
+          "rm -rf .git removes ALL git history permanently — be very careful."
         ],
         recap: [
-          "Create branches for new features",
-          "Push with --set-upstream for new branches",
-          "Pull Requests allow code review before merging",
+          "Keep main clean — develop features in branches",
+          "Reset rewrites history (dangerous), Revert creates safe undo commits",
+          "git reset --soft keeps changes staged, --hard deletes everything",
+          "Collaboration = clone + push, Contribution = fork + PR",
+          "Merge conflicts: same file, same lines, different branches → resolve manually",
+          ".gitignore hides files like .env from being tracked",
+          "Detached HEAD = read-only mode, use git switch -c to save work",
           "Always pull before pushing to avoid conflicts"
         ],
         practiceQuestions: [
-          { question: "What flag is used to push a new branch for the first time?", options: ["--new", "--first", "--set-upstream", "--create"], answer: "--set-upstream" }
+          { question: "What flag is used to push a new branch for the first time?", options: ["--new", "--first", "--set-upstream", "--create"], answer: "--set-upstream" },
+          { question: "What's the safe way to undo a commit?", options: ["git reset --hard", "git revert", "git delete", "git undo"], answer: "git revert" },
+          { question: "What does .gitignore do?", options: ["Deletes files", "Hides files from Git tracking", "Encrypts files", "Compresses files"], answer: "Hides files from Git tracking" },
+          { question: "What causes a merge conflict?", options: ["Different branches", "Same file, same lines, different changes", "Too many commits", "Using git pull"], answer: "Same file, same lines, different changes" }
         ]
       }
     ]
@@ -903,6 +934,32 @@ export const interviewQuestions: { question: string; answer: string; source: str
   { question: "What is the difference between flexbox and grid?", answer: "Flexbox is one-dimensional (row OR column), focuses on content flow. Grid is two-dimensional (rows AND columns), focuses on content placement. Grid is better for complex layouts.", source: "Bootcamp_Note.pdf" },
   { question: "What are semantic HTML tags?", answer: "Semantic tags have meaning: <strong> means important, <em> means emphasis. Non-semantic tags like <b> and <i> only affect appearance without conveying meaning.", source: "Bootcamp_Note.pdf" },
   { question: "What is the difference between position relative and absolute?", answer: "relative stays in normal flow and offsets from its normal position. absolute is removed from flow and positioned relative to the nearest positioned parent.", source: "Bootcamp_Note.pdf" },
+  // New questions from Interview_Questions PDF
+  { question: "What do you understand by the Universal Selector?", answer: "The universal selector (*) applies styles to every element on the page and is often used for CSS resets.", source: "Interview_Questions.pdf" },
+  { question: "Difference between ID selector and Class selector?", answer: "IDs (#id) are unique, used once per page, and have higher specificity. Classes (.class) are reusable, can target multiple elements, and have lower specificity.", source: "Interview_Questions.pdf" },
+  { question: "How can you use CSS to control image repetition?", answer: "Use background-repeat: no-repeat (no repeat), repeat-x (horizontal), repeat-y (vertical), or repeat (both directions).", source: "Interview_Questions.pdf" },
+  { question: "Are HTML tags and elements the same?", answer: "No. A tag is the syntax (e.g., <p>), while an element includes the tag plus its content (e.g., <p>Hello</p>).", source: "Interview_Questions.pdf" },
+  { question: "Difference between inline, block, and inline-block?", answer: "Block: takes full width, starts on new line (div, p). Inline: takes content width, no height/width (span, a). Inline-block: inline positioning but can set width/height.", source: "Interview_Questions.pdf" },
+  { question: "What is margin: 0 auto?", answer: "Horizontally centers an element with a fixed width. margin: 0 sets top/bottom to 0, auto splits remaining space equally on left and right.", source: "Interview_Questions.pdf" },
+  { question: "Why doesn't height: 100% work sometimes?", answer: "Because the parent element has no defined height. For percentage height to work, all parent elements up to the root must have a defined height.", source: "Interview_Questions.pdf" },
+  { question: "What is position in CSS?", answer: "static (default), relative (offset from itself), absolute (relative to nearest positioned parent), fixed (relative to viewport), sticky (hybrid — stays sticky until another parent comes up).", source: "Interview_Questions.pdf" },
+  { question: "Difference between <img> and background-image?", answer: "<img> is for content images (SEO friendly, has alt text). background-image is for decoration (not SEO friendly, no alt text).", source: "Interview_Questions.pdf" },
+  { question: "What is em vs rem?", answer: "em is relative to the current element's font size. rem is relative to the root element's font size (more predictable). 1rem = 16px by default.", source: "Interview_Questions.pdf" },
+  { question: "What is accessibility (a11y)?", answer: "Making websites usable for everyone. Key practices: use alt text on images, use semantic tags, add proper labels to form inputs.", source: "Interview_Questions.pdf" },
+  { question: "What are the 5 things needed to declare a variable?", answer: "1. Keyword (var/let/const), 2. Variable name, 3. Assignment operator (=), 4. Value, 5. Semicolon (;).", source: "Interview_Questions.pdf" },
+  { question: "Why do we use JavaScript?", answer: "JS is an interpreted language — we can read and run it at the same time. It dynamically updates content, controls media, animates images, and makes websites fully functional.", source: "Interview_Questions.pdf" },
+  { question: "Why do we use arrays in JavaScript?", answer: "We use arrays to store and manage multiple related values in a single variable, making data easier to work with.", source: "Interview_Questions.pdf" },
+  { question: "Why don't we use var to declare a variable?", answer: "Using var, we can declare multiple variables with the same name (no error), which causes bugs. let and const prevent redeclaration.", source: "Interview_Questions.pdf" },
+  { question: "What are the data types in JavaScript?", answer: "Primitive: String, Number, Boolean, Null, Undefined. Non-Primitive: Array, Object.", source: "Interview_Questions.pdf" },
+  { question: "What is an operator in JavaScript?", answer: "A symbol or keyword used to perform operations. 3 main types: Arithmetic (+ - * / %), Logical (&& ||), Comparison (== === > >= < <= != !==, always outputs Boolean).", source: "Interview_Questions.pdf" },
+  { question: "What is Auto Boxing in JavaScript?", answer: "Auto-boxing is JavaScript's automatic conversion of primitives (string, number, boolean) into temporary wrapper objects so we can use object methods on them.", source: "Interview_Questions.pdf" },
+  { question: "Why do we use Objects in JavaScript?", answer: "Objects group related data (key-value pairs) and functions together, making code easier to manage and scale. They organize data, enable easy key-based access, and hold both properties & methods.", source: "Interview_Questions.pdf" },
+  { question: "What is a method in an Object?", answer: "A method is a function stored as a property of an object. Function alone → function. Function inside object → method.", source: "Interview_Questions.pdf" },
+  { question: "Difference between Array and Object?", answer: "Array: ordered list, accessed by index, maintains order, for similar items, uses for/for...of. Object: key-value pairs, accessed by key, no guaranteed order, for structured data, uses for...in/Object.keys().", source: "Interview_Questions.pdf" },
+  { question: "What is a switch statement in JavaScript?", answer: "A switch statement compares one variable against multiple fixed values. It's cleaner than long if-else chains, especially for user roles or status handling.", source: "Interview_Questions.pdf" },
+  { question: "Explain Date in JavaScript?", answer: "Date is a built-in object for working with dates and times. Create with new Date(), retrieve values with get methods, modify and compare using timestamps.", source: "Interview_Questions.pdf" },
+  { question: "What is an Anonymous function?", answer: "A function with no name. You can store it in a variable and access it later through that variable.", source: "Interview_Questions.pdf" },
+  { question: "Why do we need to store the return value of push() & pop()?", answer: "We can store that value to keep track of array length (push returns new length) or to capture the removed value (pop returns removed element) for further use.", source: "Interview_Questions.pdf" },
 ];
 
 // Practice tasks from notes
@@ -954,6 +1011,37 @@ export const practiceTasks: { title: string; description: string; hint: string; 
     description: "Understand this important logic pattern: When everything must be correct, search for what's wrong first.",
     hint: "If ALL must pass → return false inside loop, true at end. If ANY can pass → return true inside loop, false at end.",
     solution: "// All must pass pattern\nfunction allPositive(arr) {\n  for (let num of arr) {\n    if (num <= 0) return false; // fail immediately\n  }\n  return true; // all passed\n}\n\n// Any can pass pattern\nfunction hasPositive(arr) {\n  for (let num of arr) {\n    if (num > 0) return true; // found one!\n  }\n  return false; // none found\n}"
+  },
+  // New tasks from web_day_19
+  {
+    title: "Find Lowest Number in Array",
+    description: "Write a function that finds the lowest number in an array. Try both Math.min with spread operator and a loop version.",
+    hint: "Method 1: Math.min(...arr) with spread operator. Method 2: Start with arr[0], loop and compare each element.",
+    solution: "// Method 1: Math.min with spread\nfunction lowestNumber(arr) {\n  return Math.min(...arr);\n}\n\n// Method 2: Loop version\nfunction lowestNumberLoop(arr) {\n  let low = arr[0];\n  for (let i = 0; i < arr.length; i++) {\n    if (arr[i] < low) {\n      low = arr[i];\n    }\n  }\n  return low;\n}\n\nconst heights = [167, 190, 120, 165, 137];\nconsole.log(lowestNumber(heights)); // 120"
+  },
+  {
+    title: "Total Salary Calculator",
+    description: "Given an array of employee objects with name, experience, starting salary, and yearly increment, calculate the total salary the company has to pay. Each employee's salary = starting + (increment × experience).",
+    hint: "Loop through array, destructure each object { starting, increment, experience }, calculate individual salary, add to total.",
+    solution: "const employees = [\n  { name: \"shahin\", experience: 5, starting: 20000, increment: 5000 },\n  { name: \"shihab\", experience: 3, starting: 15000, increment: 7000 },\n  { name: \"shikot\", experience: 9, starting: 30000, increment: 1000 },\n  { name: \"shohel\", experience: 0, starting: 29000, increment: 4000 },\n];\n\nfunction totalSalary(arr) {\n  let total = 0;\n  for (let i = 0; i < arr.length; i++) {\n    const { starting, increment, experience } = arr[i];\n    total += starting + increment * experience;\n  }\n  return total;\n}\nconsole.log(totalSalary(employees));"
+  },
+  {
+    title: "Analyze Marks (Infinity Pattern)",
+    description: "Write a function that takes a marks object and returns total, average, highest subject, and lowest subject. Use Infinity and -Infinity as safe initial values.",
+    hint: "Use -Infinity for highest (first number is always higher) and Infinity for lowest (first number is always lower). Loop with for...in.",
+    solution: "function analyzeMarks(marksObj) {\n  let total = 0;\n  let highest = -Infinity;\n  let lowest = Infinity;\n  let highestSubject = null;\n  let lowestSubject = null;\n\n  for (const key in marksObj) {\n    let value = marksObj[key];\n    total += value;\n    if (value > highest) {\n      highest = value;\n      highestSubject = key;\n    }\n    if (value < lowest) {\n      lowest = value;\n      lowestSubject = key;\n    }\n  }\n\n  let average = total / Object.keys(marksObj).length;\n  return { total, average, Highest: highestSubject, Lowest: lowestSubject };\n}\n\nconst myMarks = { math: 78, english: 65, physics: 88, bangla: 55 };\nconsole.log(analyzeMarks(myMarks));"
+  },
+  {
+    title: "Password Validator",
+    description: "Write a function that checks a password: must be 8+ characters, contain at least 1 number, 1 uppercase letter, and no spaces.",
+    hint: "Loop through each character. Check character >= '0' && character <= '9' for numbers. Check >= 'A' && <= 'Z' for uppercase. Use .includes(' ') for spaces.",
+    solution: "function checkPassword(pass) {\n  let hasUpperCase = false;\n  let hasNumber = false;\n  let reasons = [];\n  let hasSpace = pass.includes(' ');\n\n  for (let i = 0; i < pass.length; i++) {\n    let character = pass[i];\n    if (character >= '0' && character <= '9') hasNumber = true;\n    if (character >= 'A' && character <= 'Z') hasUpperCase = true;\n  }\n\n  if (pass.length < 8) reasons.push(\"Too short\");\n  if (!hasNumber) reasons.push(\"Missing number\");\n  if (!hasUpperCase) reasons.push(\"Missing uppercase\");\n  if (hasSpace) reasons.push(\"Remove spaces\");\n\n  return { valid: reasons.length === 0, reasons };\n}\nconsole.log(checkPassword(\"hello world\"));"
+  },
+  {
+    title: "Text Statistics",
+    description: "Write a function that returns character count (no spaces), word count, vowel count, and consonant count from a given string.",
+    hint: "Loop characters for count, use trim().split(/\\s+/) for words, check against vowel array for vowels/consonants.",
+    solution: "function textStats(text) {\n  let characters = 0, words = 0, vowels = 0, consonants = 0;\n  const allVowels = ['a', 'e', 'i', 'o', 'u'];\n\n  for (let char of text) {\n    if (char !== ' ') characters++;\n  }\n\n  let textArr = text.trim().split(/\\s+/);\n  words = textArr.length;\n\n  for (let char of text.toLowerCase()) {\n    if (allVowels.includes(char)) vowels++;\n    else if (char >= 'a' && char <= 'z') consonants++;\n  }\n\n  return { characters, words, vowels, consonants };\n}\nconsole.log(textStats(\" I am  OK \"));"
   }
 ];
 
